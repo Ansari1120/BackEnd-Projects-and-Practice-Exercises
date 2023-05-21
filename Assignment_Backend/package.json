@@ -1,7 +1,7 @@
 {
-  "name": "backend",
+  "name": "AssignmentBackend",
   "version": "1.0.0",
-  "description": "Hamza",
+  "description": "Ahmed",
   "main": "server.js",
   "scripts": {
     "test": "Asasa",
@@ -11,7 +11,7 @@
   "keywords": [
     "ddcs"
   ],
-  "author": "hamza",
+  "author": "Ahmed",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.0.3",

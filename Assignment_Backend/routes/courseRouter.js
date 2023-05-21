@@ -1,11 +1,11 @@
 const express = require("express");
-const InstituteModel = require("../models/InstituteModel");
+const CourseModel = require("../models/CourseModel");
 const sendResponse = require("../Helper/Helper");
 const route = express.Router();
 
 route.get("/", async (req, res) => {
   try {
-    const result = await InstituteModel.find();
+    const result = await CourseModel.find();
     if (!result) {
       res.send(sendResponse(false, null, "No Data Found")).status(404);
     } else {
@@ -22,7 +22,7 @@ route.get("/:id", (req, res) => {
 });
 
 route.post("/", async (req, res) => {
-  let { name, address, shortName, tel } = req.body;
+  let { name, duration, fees, shortName } = req.body;
   try {
     let errArr = [];
 
@@ -30,11 +30,14 @@ route.post("/", async (req, res) => {
     if (!name) {
       errArr.push("Required FirstName");
     }
-    if (!address) {
-      errArr.push("Required address");
+    if (!duration) {
+      errArr.push("Required duration");
     }
-    if (!tel) {
-      errArr.push("Required contact");
+    if (!fees) {
+      errArr.push("Required fees");
+    }
+    if (!shortName) {
+      errArr.push("Required shortName");
     }
 
     if (errArr.length > 0) {
@@ -43,15 +46,13 @@ route.post("/", async (req, res) => {
         .status(400);
       return;
     } else {
-      let obj = { name, address, shortName, tel };
-      let Institute = new InstituteModel(obj);
-      await Institute.save();
-      if (!Institute) {
+      let obj = { name, duration, fees, shortName };
+      let Course = new CourseModel(obj);
+      await Course.save();
+      if (!Course) {
         res.send(sendResponse(false, null, "Data Not Found")).status(404);
       } else {
-        res
-          .send(sendResponse(true, Institute, "Save Successfully"))
-          .status(200);
+        res.send(sendResponse(true, Course, "Save Successfully")).status(200);
       }
     }
   } catch (e) {

@@ -1,11 +1,10 @@
 // Node JS k basic Concepts
 
-
 // console.log("Hello World") //node server.js (for run)
 
-const fs= require('fs')
+const fs = require("fs");
 
-// ====== Read DIrectory === 
+// ====== Read DIrectory ===
 // fs.readdir('./',(err,dir)=>{
 //     console.log(dir)
 // })
@@ -33,17 +32,19 @@ const fs= require('fs')
 //             }
 // })
 let book = [
-    {
-        id:01,
-        name:"Hamza"
-    },{
-        id:02,
-        name:"Talha"
-    },{
-        id:03,
-        name:"Anas"
-    }
-]
+  {
+    id: 01,
+    name: "Hamza",
+  },
+  {
+    id: 02,
+    name: "Talha",
+  },
+  {
+    id: 03,
+    name: "Anas",
+  },
+];
 // const http = require('http')
 // const server = http.createServer((req,res)=>{
 //     console.log("CHal gya")
@@ -53,7 +54,7 @@ let book = [
 //     }else if(req.url=="/hamza"){
 //         res.write(JSON.stringify(a))
 //     }
-    
+
 //     if(req.url=="/hamzakamelen"){
 //         if(req.method=="GET"){
 //             res.write(JSON.stringify(a))
@@ -93,11 +94,8 @@ let book = [
 
 // app.listen(5000)
 
-
-
 // const express = require("express")
 // const app = express();
-
 
 // app.get("/coruse", (req,res) => {
 //     res.send(book)
@@ -113,41 +111,44 @@ let book = [
 //     }
 // })
 
-
-
-
-const express = require('express');
-require('dotenv').config();
-const mongoose = require('mongoose')
+const express = require("express");
+require("dotenv").config();
+const mongoose = require("mongoose");
 const app = express();
-const StudentRouter = require('./routes/studentRouter');
+//const StudentRouter = require("./routes/studentRouter");
+//const TeacherRouter = require("./routes/teacherRouter");
+const InstituteRouter = require("./routes/instituteRouter");
+const courseRouter = require("./routes/courseRouter");
 app.use(express.json());
-app.use('/api/student',StudentRouter);
+//app.use("/api/student", StudentRouter);
+//app.use("/api/teacher", TeacherRouter);
+//app.use("/api/institute", InstituteRouter);
+app.use("/api/course", courseRouter);
+console.log("connection sucessfull");
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("database Connected SucessFully");
+    app.listen(process.env.PORT, () => {
+      console.log("server is listning on the port 5000");
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
-mongoose.connect(process.env.MONGO_URI).then(()=>{console.log("database Connected SucessFully")
-app.listen(process.env.PORT,()=>{
-    console.log('server is listning on 5000')
-})
-}).catch((err)=>{console.log(err)})
-
-
-
-
-
-//npm i -g nodemon 
+//npm i -g nodemon
 //install  this liberary to get rid of starting and ending server again and again after some changes.
 //npm i .env
-//create new account for mongo db 
+//create new account for mongo db
 //from this url : https://www.mongodb.com/atlas/database
 //how to connect mongo db
 //select driver option
-//copy mongo_url and past it into .env file 
+//copy mongo_url and past it into .env file
 //npm i mongoose to establish connection with mongo db.
 //username : Ansari1120
 //password: 1o6kifilit
 //npm install mongodb
 
-
-
-//task 
+//task
 //make models and thier schema of remaining routes
