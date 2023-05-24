@@ -17,10 +17,37 @@ route.get("/", async (req, res) => {
   }
 });
 
-route.get("/:id", (req, res) => {
-  res.send("Get single Student Data");
-});
+route.get("/:id",async(req, res) => {
+  try {
+    let id = req.params.id
+    const result = await StudentModel.findById(id);
+    console.log(result)
+    if (!result) {
+      res.send(sendResponse(false, null, "No Data Found")).status(404);
+    } else {
+      res.send(sendResponse(true, result, "Data Found")).status(200);
+    }
+  } catch (e) {
+    console.log(e);
+    res.send(sendResponse(false, null, "Server Internal Error")).status(400);
+  }});
 
+route.get("/search", async (req, res) => {
+  let { firstName, lastName } = req.body;
+  try {
+    let result = await StudentModel.find({
+      firstName: firstName,
+      lastName: lastName,
+    });
+    if (!result) {
+      res.send(sendResponse(false, null, "No Data Found")).status(404);
+    } else {
+      res.send(sendResponse(true, result), "Data found").status(200);
+    }
+  } catch (e) {
+    res.send(sendResponse(false, null, "Internal Server Error")).status(400);
+  }
+});
 
 route.post("/", async (req, res) => {
   let { firstName, lastName, email, password, contact } = req.body;
@@ -63,12 +90,52 @@ route.post("/", async (req, res) => {
   res.send("Post single Student Data");
 });
 
-route.put("/:id", (req, res) => {
-  res.send("put single Student Data");
+route.put("/:id", async (req, res) => {
+  try {
+    let id = req.params.id;
+    let result = await StudentModel.findById(id);
+    if (!result) {
+      res.send(sendResponse(false, null, "No Data Found")).status(404);
+    } else {
+      let updateResult = await StudentModel.findByIdAndUpdate(id, req.body, {
+        new: true,
+      });
+      if (!updateResult) {
+        res.send(sendResponse(false, null, "No Data Found")).status(404);
+      } else {
+        res
+          .send(sendResponse(true, updateResult, "Data updated SucessFully"))
+          .status(200);
+      }
+    }
+  } catch (e) {
+    res.send(sendResponse(false, null, "Internal Server Error")).status(400);
+  }
 });
 
-route.delete("/:id", (req, res) => {
-  res.send("single Student Data");
+route.delete("/:id", async (req, res) => {
+  try {
+    let id = req.params.id;
+    let result = await StudentModel.findById(id);
+    if (!result) {
+      res
+        .send(sendResponse(false, null, "No Data Found on this id"))
+        .status(404);
+    } else {
+      let deleteById = await StudentModel.findByIdAndDelete(id);
+      if (!deleteById) {
+        res.send(sendResponse(false, null, "Error")).status(404);
+      } else {
+        res
+          .send(sendResponse(true, deleteById, "Data Deleted SucessFully"))
+          .status(200);
+      }
+    }
+  } catch (e) {
+    res
+      .send(sendResponse(true, deleteById, "Internal Server Error"))
+      .status(400);
+  }
 });
 //example http://localhost:5000/api/student/4
 
