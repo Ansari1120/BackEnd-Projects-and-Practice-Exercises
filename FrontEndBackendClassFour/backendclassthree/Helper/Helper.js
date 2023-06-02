@@ -3,13 +3,17 @@ var ResponseObj = {
     data:null,
     message:"",
     error:"",
+    page:null,
+    limit:null,
 }
 
-const sendResponse = (status,data,message,error) =>{
+const sendResponse = (status,data,message,error,page,limit) =>{
     ResponseObj.status = status;
     ResponseObj.data = data;
     ResponseObj.message = message;
     ResponseObj.error = error;
+    ResponseObj.page = page;
+    ResponseObj.limit = limit;
     return ResponseObj
 }
 

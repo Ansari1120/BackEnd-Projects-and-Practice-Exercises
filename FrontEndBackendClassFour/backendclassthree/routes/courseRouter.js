@@ -5,11 +5,21 @@ const route = express.Router();
 
 route.get("/", async (req, res) => {
   try {
-    const result = await CourseModel.find();
+    let { page, limit, sort, asc } = req.query;
+    if (!page) page = 1;
+    if (!limit) limit = 10;
+
+    const skip = (page - 1) * 10;
+    const result = await CourseModel.find()
+      .sort({ [sort]: asc })
+      .skip(skip)
+      .limit(limit);
     if (!result) {
       res.send(sendResponse(false, null, "No Data Found")).status(404);
     } else {
-      res.send(sendResponse(true, result, "Data Found")).status(200);
+      res
+        .send(sendResponse(true, result, "Data Found", "", page, limit))
+        .status(200);
     }
   } catch (e) {
     console.log(e);
@@ -17,12 +27,11 @@ route.get("/", async (req, res) => {
   }
 });
 
-
-route.get("/:id", async(req, res) => {
+route.get("/:id", async (req, res) => {
   try {
-    let id = req.params.id
+    let id = req.params.id;
     const result = await CourseModel.findById(id);
-    console.log(result)
+    console.log(result);
     if (!result) {
       res.send(sendResponse(false, null, "No Data Found")).status(404);
     } else {
@@ -33,7 +42,6 @@ route.get("/:id", async(req, res) => {
     res.send(sendResponse(false, null, "Server Internal Error")).status(400);
   }
 });
-
 
 route.post("/", async (req, res) => {
   let { name, duration, fees, shortName } = req.body;

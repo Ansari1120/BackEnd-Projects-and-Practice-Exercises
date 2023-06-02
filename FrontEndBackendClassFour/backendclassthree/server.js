@@ -105,7 +105,7 @@ let book = [
 //     let id = req.params.id
 //     let obj = book.find((x) => x.id == id);
 //     if(obj){
-//         res.send(obj).status(200)                  
+//         res.send(obj).status(200)
 //     } else {
 //         res.send("No data found").status(404)
 //     }
@@ -115,13 +115,13 @@ const express = require("express");
 require("dotenv").config();
 const mongoose = require("mongoose");
 const app = express();
-const cors = require('cors')
+const cors = require("cors");
 //const StudentRouter = require("./routes/studentRouter");
 //const TeacherRouter = require("./routes/teacherRouter");
 //const InstituteRouter = require("./routes/instituteRouter");
 const courseRouter = require("./routes/courseRouter");
 app.use(express.json());
-app.use(cors())
+app.use(cors());
 //app.use("/api/student", StudentRouter);
 //app.use("/api/teacher", TeacherRouter);
 //app.use("/api/institute", InstituteRouter);

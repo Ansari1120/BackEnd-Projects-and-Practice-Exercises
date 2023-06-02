@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
-import { Post } from "../config/apibasemethod";
+import { Post } from "../../config/apibasemethod";
 
 function PostCrouse() {
   const [model, setmodel] = useState({});

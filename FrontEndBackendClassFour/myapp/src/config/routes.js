@@ -2,7 +2,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Courses from "../components/CouseScreen/Courses";
 import Singlecard from "../components/CouseScreen/singlecard";
 import EditPost from "../components/studentScreen/studentedit";
-import PostCrouse from "../components/CouseScreen/PutCourses";
 import Students from "../components/studentScreen/student";
 import Studentcard from "../components/studentScreen/studentcard";
 import StudentCrouse from "../components/studentScreen/studentCrouse";
@@ -15,6 +14,7 @@ import Teacher from "../components/TeacherScreen/Teacher";
 import SingleTeacher from "../components/TeacherScreen/singleTeacher";
 import PostTeacher from "../components/TeacherScreen/postTeacher";
 import EditTeacher from "../components/TeacherScreen/editTeacher";
+import PostCrouse from "../components/CouseScreen/postCrouse";
 
 export default function AppRouter() {
   return (

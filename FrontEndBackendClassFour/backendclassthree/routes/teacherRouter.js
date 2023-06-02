@@ -5,11 +5,21 @@ const route = express.Router();
 
 route.get("/", async (req, res) => {
   try {
-    const result = await TeacherModel.find();
+    let { page, limit, sort, asc } = req.query;
+    if (!page) page = 1;
+    if (!limit) limit = 10;
+
+    const skip = (page - 1) * 10;
+    const result = await TeacherModel.find()
+      .sort({ [sort]: asc })
+      .skip(skip)
+      .limit(limit);
     if (!result) {
       res.send(sendResponse(false, null, "No Data Found")).status(404);
     } else {
-      res.send(sendResponse(true, result, "Data Found")).status(200);
+      res
+        .send(sendResponse(true, result, "Data Found", "", page, limit))
+        .status(200);
     }
   } catch (e) {
     console.log(e);

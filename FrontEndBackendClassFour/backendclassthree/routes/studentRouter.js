@@ -5,7 +5,33 @@ const route = express.Router();
 
 route.get("/", async (req, res) => {
   try {
-    const result = await StudentModel.find();
+    let { page, limit, sort, asc } = req.query;
+    if (!page) page = 1;
+    if (!limit) limit = 10;
+
+    const skip = (page - 1) * 10;
+    const result = await StudentModel.find()
+      .sort({ [sort]: asc })
+      .skip(skip)
+      .limit(limit);
+    if (!result) {
+      res.send(sendResponse(false, null, "No Data Found")).status(404);
+    } else {
+      res
+        .send(sendResponse(true, result, "Data Found", "", page, limit))
+        .status(200);
+    }
+  } catch (e) {
+    console.log(e);
+    res.send(sendResponse(false, null, "Server Internal Error")).status(400);
+  }
+});
+
+route.get("/:id", async (req, res) => {
+  try {
+    let id = req.params.id;
+    const result = await StudentModel.findById(id);
+    console.log(result);
     if (!result) {
       res.send(sendResponse(false, null, "No Data Found")).status(404);
     } else {
@@ -16,21 +42,6 @@ route.get("/", async (req, res) => {
     res.send(sendResponse(false, null, "Server Internal Error")).status(400);
   }
 });
-
-route.get("/:id",async(req, res) => {
-  try {
-    let id = req.params.id
-    const result = await StudentModel.findById(id);
-    console.log(result)
-    if (!result) {
-      res.send(sendResponse(false, null, "No Data Found")).status(404);
-    } else {
-      res.send(sendResponse(true, result, "Data Found")).status(200);
-    }
-  } catch (e) {
-    console.log(e);
-    res.send(sendResponse(false, null, "Server Internal Error")).status(400);
-  }});
 
 route.get("/search", async (req, res) => {
   let { firstName, lastName } = req.body;
