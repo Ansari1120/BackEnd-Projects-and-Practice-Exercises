@@ -120,12 +120,14 @@ const cors = require("cors");
 //const TeacherRouter = require("./routes/teacherRouter");
 //const InstituteRouter = require("./routes/instituteRouter");
 const courseRouter = require("./routes/courseRouter");
+const userRoutes = require("./routes/userRoutes");
 app.use(express.json());
 app.use(cors());
 //app.use("/api/student", StudentRouter);
 //app.use("/api/teacher", TeacherRouter);
 //app.use("/api/institute", InstituteRouter);
 app.use("/api/course", courseRouter);
+app.use("/api/user", userRoutes);
 console.log("connection sucessfull");
 mongoose
   .connect(process.env.MONGO_URI)
