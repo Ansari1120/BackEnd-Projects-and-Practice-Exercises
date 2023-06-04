@@ -1,18 +1,20 @@
 const { decode } = require("jsonwebtoken");
 const sendResponse = require("../Helper/Helper");
 const userModel = require("../models/userModel");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const AuthController = {
   login: async (req, res) => {
     const { email, password } = req.body;
     const obj = { email, password };
+    console.log(obj);
     let result = await userModel.findOne({ email });
     if (result) {
       let isConfirm = await bcrypt.compare(obj.password, result.password);
-      console.log(isConfirm);
       if (isConfirm) {
         let token = jwt.sign({ ...result }, process.env.SECURE_KEY, {
-          expiresIn: "1h",
+          expiresIn: "24h",
         });
         res.send(
           sendResponse(true, { user: result, token }, "Login Successfully")

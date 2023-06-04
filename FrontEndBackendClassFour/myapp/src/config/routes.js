@@ -15,6 +15,7 @@ import SingleTeacher from "../components/TeacherScreen/singleTeacher";
 import PostTeacher from "../components/TeacherScreen/postTeacher";
 import EditTeacher from "../components/TeacherScreen/editTeacher";
 import PostCrouse from "../components/CouseScreen/postCrouse";
+import SignupLogin from "../components/LoginScreen/SignupLogin";
 
 export default function AppRouter() {
   return (
@@ -44,6 +45,9 @@ export default function AppRouter() {
           <Route path="/SingleTeacher/:id" element={<SingleTeacher />} />
           <Route path="/PostTeacher" element={<PostTeacher />} />
           <Route path="/EditTeacher/:id" element={<EditTeacher />} />
+          {/* end Cridentitals */}
+          <Route path="/SignupLogin" element={<SignupLogin />} />
+          
         </Routes>
       </BrowserRouter>
     </>
