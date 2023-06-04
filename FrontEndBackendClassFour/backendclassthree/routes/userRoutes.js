@@ -3,6 +3,7 @@ const route = express.Router();
 const sendResponse = require("../Helper/Helper");
 const UserModel = require("../models/userModel");
 const bcrypt = require("bcryptjs");
+const AuthController = require("../Controller/authController");
 
 route.post("/signup", async (req, res) => {
   const { userName, email, password } = req.body;
@@ -43,23 +44,10 @@ route.post("/signup", async (req, res) => {
     }
   }
 });
-route.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  const obj = { email, password };
-
-  UserModel.findOne({ email })
-    .then(async (user) => {
-      let isConfirm = await bcrypt.compare(obj.password, user.password);
-      console.log(isConfirm);
-      if (isConfirm) {
-        res.send(sendResponse(true, user, "Login Successfully"));
-      } else {
-        res.send(sendResponse(false, null, "Credential Error"));
-      }
-    })
-    .catch((err) => {
-      res.send(sendResponse(false, err, "User Doesn't Exist"));
-    });
+route.post("/login", AuthController.login);
+route.get("/", AuthController.getUsers);
+route.get("/test", AuthController.protected, (req, res) => {
+  res.send("/User Valid");
 });
 route.post("/");
 route.get("/");
