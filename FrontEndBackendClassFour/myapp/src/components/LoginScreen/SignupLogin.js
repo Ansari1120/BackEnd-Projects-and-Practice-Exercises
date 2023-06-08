@@ -16,6 +16,20 @@ const SignupLogin = () => {
       });
   };
   const Signup = () => {};
+  const getUser = () => {
+    axios
+      .get("http://localhost:5000/api/user/test", {
+        headers: {
+          Authorization: `Bearer${localStorage.getItem("testingToken")}`,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
   const LogOut = () => {
     localStorage.removeItem("token");
     console.log("User Logged Out SucessFully");
@@ -49,8 +63,9 @@ const SignupLogin = () => {
       />
       <button onClick={() => setSwitch(!Switch)}>Switch to Signup</button>
       <button onClick={Login}>Login</button>
-      <button onClick={Signup}>Signup</button>
       <button onClick={LogOut}>LogOut</button>
+      <button onClick={Signup}>Signup</button>
+      <button onClick={getUser}>Get Current User Logged In </button>
     </>
   );
 };
