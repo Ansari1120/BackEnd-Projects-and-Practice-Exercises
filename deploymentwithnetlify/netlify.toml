@@ -1,2 +1,6 @@
 [build]
     functions = "functions"
+[[headers]]
+  for = "/.netlify/functions/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
