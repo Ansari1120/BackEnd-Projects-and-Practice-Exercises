@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import Modal from "./Modal";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { Toaster, toast } from "react-hot-toast";
+import { Trash2, FileEdit } from "lucide-react";
 interface userType {
   title: string;
   description: string;
@@ -19,10 +21,12 @@ const Post = (props: any) => {
   console.log(postToEdit);
   const handleSubmit = (e: any) => {
     e.preventDefault();
+    toast.loading("Editing Post please wait.... 🚀", { id: post.id });
     axios
       .patch(`http://localhost:3000/api/post/${post.id}`, postToEdit)
       .then((res) => {
         console.log(res);
+        toast.success("Blog Edited Successfully", { id: post.id });
       })
       .catch((err) => {
         console.log(err);
@@ -32,11 +36,13 @@ const Post = (props: any) => {
         router.refresh();
       });
   };
-  const handleDelete = (postToDelete: any) => {
+  const handleDelete = () => {
+    toast.loading("Deleting Post please wait.... 🚀", { id: post.id });
     axios
       .delete(`http://localhost:3000/api/post/${post.id}`)
       .then((res) => {
         console.log(res);
+        toast.success("Blog Deleted Successfully", { id: post.id });
       })
       .catch((err) => {
         console.log(err);
@@ -46,16 +52,21 @@ const Post = (props: any) => {
         router.refresh();
       });
   };
+
   return (
-    <li className="p-3 my-5 bg-slate-200" key={post.id}>
-      <h1 className="text-2xl font=bold">{post.title}</h1>
-      <p>{post.description}</p>
+    <li
+      className="p-3 my-5 bg-slate-300 bg-opacity-50 rounded-lg"
+      key={post.id}
+    >
+      <Toaster />
+      <h1 className="text-2xl font-semibold">{post.title}</h1>
+      <p className="text-xl pt-2">{post.description}</p>
       <div className="pt-5">
         <button
           onClick={() => setOpenModalEdit(true)}
           className="text-blue-500 mr-3"
         >
-          Edit
+          <FileEdit />
         </button>
         {openModalEdit && (
           <Modal openModal={openModalEdit} setOpenModal={setOpenModalEdit}>
@@ -101,7 +112,7 @@ const Post = (props: any) => {
           onClick={() => setOpenModalDelete(true)}
           className="text-red-500 mr-3"
         >
-          Delete
+          <Trash2 />
         </button>
         <Modal openModal={openModalDelete} setOpenModal={setOpenModalDelete}>
           <h1 className="text-2xl pb-3">
@@ -109,7 +120,7 @@ const Post = (props: any) => {
           </h1>
           <div>
             <button
-              onClick={() => handleDelete(post.id)}
+              onClick={handleDelete}
               className="text-blue-700 font-bold mr-5"
             >
               Yes

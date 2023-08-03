@@ -25,7 +25,7 @@ const Navbar = () => {
   ];
   return (
     <div>
-      <ul className="flex font-black py-19 gap-5">
+      <ul className="flex font-black py-19 gap-5 justify-center text-xl">
         {navItems.map((data: any, ind: number) => {
           return (
             <Link
@@ -33,8 +33,8 @@ const Navbar = () => {
               href={data.route}
               className={
                 pathName === `${data.route}`
-                  ? "text-blue-500 font-bold"
-                  : "text-black"
+                  ? "text-black font-bold bg-gray-400 bg-opacity-50 p-2 rounded-md"
+                  : "text-white"
               }
             >
               {data.name}

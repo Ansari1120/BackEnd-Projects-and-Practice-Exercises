@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Modal from "./Modal";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { Toaster, toast } from "react-hot-toast";
 interface userType {
   title: string;
   description: string;
@@ -16,10 +17,12 @@ const AddPost = () => {
   });
   const handleSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
+    toast.loading("Adding Post please wait.... 🚀", { id: "1" });
     axios
       .post("http://localhost:3000/api/post", userInput)
       .then((res) => {
         console.log(res);
+        toast.success("Blog Post Added Sucessfully ");
       })
       .catch((err) => {
         console.log(err);
@@ -36,6 +39,7 @@ const AddPost = () => {
 
   return (
     <div>
+      <Toaster />
       <button
         onClick={() => setOpenModal(true)}
         className="bg-blue-500 text-white p-3 cursor-pointer rounded-md"
@@ -43,8 +47,8 @@ const AddPost = () => {
         Add New Post
       </button>
       <Modal openModal={openModal} setOpenModal={setOpenModal}>
-        <form className="w-full" onSubmit={handleSubmit} >
-          <h1 className="text-2xl pb-3">Add New Post</h1>
+        <form className="w-full" onSubmit={handleSubmit}>
+          <h1 className="text-2xl pb-3 ">Add New Post</h1>
           <input
             type="text"
             placeholder="title"
@@ -65,7 +69,10 @@ const AddPost = () => {
               setUserInput({ ...userInput, description: e.target.value });
             }}
           />
-          <button type="submit" className="bg-blue-700 text-white px-5 py-2 rounded-md">
+          <button
+            type="submit"
+            className="bg-blue-700 text-white px-5 py-2 rounded-md"
+          >
             Submit
           </button>
         </form>
