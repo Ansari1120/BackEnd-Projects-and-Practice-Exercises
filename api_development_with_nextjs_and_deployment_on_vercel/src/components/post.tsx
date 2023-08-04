@@ -5,9 +5,12 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Toaster, toast } from "react-hot-toast";
 import { Trash2, FileEdit } from "lucide-react";
+import Image from "next/image";
+import ImageUpload from "./ImageUpload";
 interface userType {
   title: string;
   description: string;
+  imageSrc: string;
 }
 const Post = (props: any) => {
   const router = useRouter();
@@ -16,6 +19,7 @@ const Post = (props: any) => {
   const [postToEdit, setPostToEdit] = useState<userType>({
     title: post.title,
     description: post.description,
+    imageSrc: post.imageSrc,
   });
   const [openModalDelete, setOpenModalDelete] = useState(false);
   console.log(postToEdit);
@@ -53,14 +57,41 @@ const Post = (props: any) => {
       });
   };
 
+  const setCustomValue = (id: any, value: any) => {
+    setPostToEdit((prevValues) => ({
+      ...prevValues,
+      [id]: value,
+    }));
+  };
+
   return (
-    <li
-      className="p-3 my-5 bg-slate-300 bg-opacity-50 rounded-lg"
+    <div
+      className="my-5 bg-slate-300 bg-opacity-50 rounded-lg border-2 p-4"
       key={post.id}
     >
-      <Toaster />
-      <h1 className="text-2xl font-semibold">{post.title}</h1>
-      <p className="text-xl pt-2">{post.description}</p>
+      <div>
+        <Toaster />
+        <div className="flex gap-2 justify-between items-center">
+          {post.imageSrc !== null ? (
+            <Image
+              className="rounded-md"
+              src={post.imageSrc}
+              width={400}
+              height={400}
+              alt="Image"
+            />
+          ) : (
+            <p>No image available</p>
+          )}
+
+          <div className="w-[530px] flex flex-col gap-4 leading-[1.5]">
+            <h1 className="text-2xl font-semibold">{post.title}</h1>
+
+            <p className="text-xl pt-2">{post.description}</p>
+          </div>
+        </div>
+      </div>
+
       <div className="pt-5">
         <button
           onClick={() => setOpenModalEdit(true)}
@@ -71,7 +102,13 @@ const Post = (props: any) => {
         {openModalEdit && (
           <Modal openModal={openModalEdit} setOpenModal={setOpenModalEdit}>
             <form className="w-full" onSubmit={handleSubmit}>
-              <h1 className="text-2xl pb-3">Add New Post</h1>
+              <h1 className="text-2xl pb-3">Edit Post</h1>
+              <div>
+                <ImageUpload
+                  value={postToEdit.imageSrc}
+                  onChange={(value) => setCustomValue("imageSrc", value)}
+                />
+              </div>
               <input
                 type="text"
                 placeholder="title"
@@ -134,7 +171,7 @@ const Post = (props: any) => {
           </div>
         </Modal>
       </div>
-    </li>
+    </div>
   );
 };
 

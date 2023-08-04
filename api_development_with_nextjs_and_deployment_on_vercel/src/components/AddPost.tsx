@@ -4,8 +4,10 @@ import Modal from "./Modal";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Toaster, toast } from "react-hot-toast";
+import ImageUpload from "./ImageUpload";
 interface userType {
   title: string;
+  imageSrc: string;
   description: string;
 }
 const AddPost = () => {
@@ -13,6 +15,7 @@ const AddPost = () => {
   const [openModal, setOpenModal] = useState<any>(false);
   const [userInput, setUserInput] = useState<userType>({
     title: "",
+    imageSrc: "",
     description: "",
   });
   const handleSubmit = (e: { preventDefault: () => void }) => {
@@ -31,12 +34,18 @@ const AddPost = () => {
         setUserInput({
           title: "",
           description: "",
+          imageSrc: "",
         });
         setOpenModal(false);
         router.refresh();
       });
   };
-
+  const setCustomValue = (id: any, value: any) => {
+    setUserInput((prevValues) => ({
+      ...prevValues,
+      [id]: value,
+    }));
+  };
   return (
     <div>
       <Toaster />
@@ -49,6 +58,12 @@ const AddPost = () => {
       <Modal openModal={openModal} setOpenModal={setOpenModal}>
         <form className="w-full" onSubmit={handleSubmit}>
           <h1 className="text-2xl pb-3 ">Add New Post</h1>
+          <div>
+            <ImageUpload
+              value={userInput.imageSrc}
+              onChange={(value) => setCustomValue("imageSrc", value)}
+            />
+          </div>
           <input
             type="text"
             placeholder="title"
