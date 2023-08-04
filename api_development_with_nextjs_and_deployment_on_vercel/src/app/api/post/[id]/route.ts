@@ -33,7 +33,7 @@ export const PATCH = async (
 ) => {
   try {
     const body = await req.json();
-    const { title, description } = body;
+    const { title, description,imageSrc } = body;
     const { id } = params;
     const updatePost = await prisma.post.update({
       where: {
@@ -42,6 +42,7 @@ export const PATCH = async (
       data: {
         title,
         description,
+        imageSrc,
       },
     });
 

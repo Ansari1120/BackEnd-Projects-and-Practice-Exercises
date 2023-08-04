@@ -31,13 +31,13 @@ const Post = (props: any) => {
       .then((res) => {
         console.log(res);
         toast.success("Blog Edited Successfully", { id: post.id });
+        router.refresh();
       })
       .catch((err) => {
         console.log(err);
       })
       .finally(() => {
         setOpenModalEdit(false);
-        router.refresh();
       });
   };
   const handleDelete = () => {

@@ -15,11 +15,7 @@ const Navbar = () => {
       route: "/about",
     },
     {
-      name: "Posts",
-      route: "/posts",
-    },
-    {
-      name: "My_Crud_Api_Post_Page",
+      name: "Blogs",
       route: "/mycrudoperations",
     },
   ];
