@@ -1,15 +1,21 @@
 import prisma from "@/lib/prismaClient";
+import { User } from "@/model/userModel";
 import { NextRequest, NextResponse } from "next/server";
+import { parse } from "url";
 
 export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    const { title, description, imageSrc } = body;
+    const { title, description, imageSrc, authorImg, authorName, blogLikes } =
+      body;
     const newPost = await prisma.post.create({
       data: {
         title,
         description,
         imageSrc,
+        authorImg,
+        authorName,
+        blogLikes,
       },
     });
 
@@ -22,9 +28,15 @@ export const POST = async (req: NextRequest) => {
   }
 };
 
-export const GET = async () => {
+export const GET = async (req: NextRequest) => {
   try {
-    const newPost = await prisma.post.findMany();
+    const parsedUrl = parse(req.url, true);
+    const user:any = parsedUrl.query.user;
+    const newPost = await prisma.post.findMany({
+      where: {
+        authorName: user,
+      },
+    });
 
     return NextResponse.json(newPost);
   } catch (error) {
