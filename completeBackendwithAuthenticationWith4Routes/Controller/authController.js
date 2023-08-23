@@ -67,6 +67,60 @@ const AuthController = {
       }
     });
   },
+  changePassword: async (req, res) => {
+    try {
+      const { email, newPassword, oldPassword } = req.body;
+
+      const user = await userModel.findOne({ email: email });
+
+      if (user) {
+        const passwordValid = bcrypt.compare(oldPassword, user.password);
+        if (!passwordValid) {
+          res
+            .send(sendResponse(false, null, "Old Password is Wrong"))
+            .status(404);
+        }
+        const newhashPassword = await bcrypt.hash(newPassword, 12);
+        user.password = newhashPassword;
+        await user.save();
+        res.send(sendResponse(true, user, "Password is Changed !")).status(200);
+      } else {
+        res.send(sendResponse(false, null, "user not found !")).status(404);
+      }
+    } catch (error) {
+      res.send(sendResponse(false, error, "Internal Server Error")).status(400);
+    }
+  },
+  deleteUser: async (req, res) => {
+    try {
+      let id = req.params.id;
+      const { email, password } = req.body;
+      const user = await userModel.findById(id);
+      if (user) {
+        const passwordValid = bcrypt.compare(password, user.password);
+        if (!passwordValid) {
+          res
+            .send(sendResponse(false, null, "Your Provided Password is Wrong"))
+            .status(404);
+        }
+        const deleteUser = await userModel.findByIdAndDelete(id);
+
+        if (!deleteUser) {
+          res
+            .send(sendResponse(false, null, "Error:Something Went Wrong"))
+            .status(400);
+        } else {
+          res
+            .send(sendResponse(true, deleteUser, "User Deleted SucessFully !"))
+            .status(200);
+        }
+      } else {
+        res
+          .send(sendResponse(false, null, "No Data Found on this id"))
+          .status(404);
+      }
+    } catch (error) {}
+  },
 };
 
 module.exports = AuthController;

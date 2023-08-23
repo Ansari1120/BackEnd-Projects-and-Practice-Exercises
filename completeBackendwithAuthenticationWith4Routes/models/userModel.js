@@ -13,6 +13,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  oldPassword: {
+    type: String,
+  },
+  newPassword: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("users", userSchema);

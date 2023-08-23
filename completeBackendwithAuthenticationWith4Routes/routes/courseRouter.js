@@ -18,6 +18,7 @@ route.put("/:id", Controller.EditCourse);
 
 route.delete("/:id", Controller.DeleteCourse);
 
+
 //example http://localhost:5000/api/student/4
 
 module.exports = route;
