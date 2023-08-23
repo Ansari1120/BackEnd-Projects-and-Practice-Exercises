@@ -1,5 +1,4 @@
 import prisma from "@/lib/prismaClient";
-import { User } from "@/model/userModel";
 import { NextRequest, NextResponse } from "next/server";
 import { parse } from "url";
 
@@ -31,7 +30,17 @@ export const POST = async (req: NextRequest) => {
 export const GET = async (req: NextRequest) => {
   try {
     const parsedUrl = parse(req.url, true);
-    const user:any = parsedUrl.query.user;
+    const user: any = parsedUrl.query.user;
+    if (!user) {
+      return NextResponse.json(
+        {
+          message: "Please Enter Your Admin Id To see Your Added Blogs",
+        },
+        {
+          status: 204,
+        }
+      );
+    }
     const newPost = await prisma.post.findMany({
       where: {
         authorName: user,
