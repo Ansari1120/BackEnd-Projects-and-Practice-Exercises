@@ -14,6 +14,7 @@ Click on connect:
 ![image](https://github.com/Ansari1120/BackEnd-Projects-and-Practice-Exercises/assets/114314363/0796e0bf-43b0-42a9-83b1-ab5eea69e23e)
 
 To select your desired project to connect click on :
+
 ![image](https://github.com/Ansari1120/BackEnd-Projects-and-Practice-Exercises/assets/114314363/5c178883-063c-45af-b377-b6c4d03f22e9)
 
 Copy env data and then create .env file past data there:
