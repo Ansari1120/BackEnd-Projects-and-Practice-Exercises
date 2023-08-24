@@ -1,5 +1,15 @@
 # BackEnd-Projects-and-Practice-Exercises
-It Includes Server Side Scripting Technologies Like : Express Js Frameworks Works with Node js And Mongo Db Database. 
+It Includes Server Side Scripting Technologies Like : 
+- Express Js
+- Frameworks Works with Node js
+-  Mongo Db
+-  postgresql Database
+-  Prisma orm
+-  Drizzle Orm
+-  brcyptjs for password hashing
+-  jwt for authentication
+-   nextauth for authentication
+-   vine js for validation.
 
 <h2>Deployed over netlify using its configurations:</h2>
 BASE_URL) https://backendtestapione.netlify.app/.netlify/functions/api/student
