@@ -16,7 +16,7 @@ BASE_URL) https://backendtestapione.netlify.app/.netlify/functions/api/student
 <p>EndPoints available : user, teacher, student,institute , course (apply get post put delete on it) /p>
   
 <h2>Deployed over Cyclic with its configurations:</h2>
-BASE_URL) https://tasty-bear-jacket.cyclic.app/
+BASE_URL) https://better-ruby-hosiery.cyclic.cloud/
 
 <p>EndPoints available : user , course (apply get post put delete on it) </p>
 
