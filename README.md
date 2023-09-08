@@ -1,15 +1,16 @@
 # BackEnd-Projects-and-Practice-Exercises
 It Includes Server Side Scripting Technologies Like : 
 - Express Js
-- Frameworks Works with Node js
--  Mongo Db
--  postgresql Database
--  Prisma orm
--  Drizzle Orm
--  brcyptjs for password hashing
--  jwt for authentication
--   nextauth for authentication
--   vine js for validation.
+- Next Js
+- Node js
+- Mongo Db
+- postgresql Database
+- Prisma orm
+- Drizzle Orm
+- brcyptjs for password hashing
+- jwt for authentication
+- nextauth for authentication
+- vine js for validation.
 
 <h2>Deployed over netlify using its configurations:</h2>
 BASE_URL) https://backendtestapione.netlify.app/.netlify/functions/api/student
@@ -18,7 +19,7 @@ BASE_URL) https://backendtestapione.netlify.app/.netlify/functions/api/student
 <h2>Deployed over Cyclic with its configurations:</h2>
 BASE_URL) https://better-ruby-hosiery.cyclic.cloud/
 
-<p>EndPoints available : user , course (apply get post put delete on it) </p>
+<p>EndPoints available : user , course , projects , tasks (apply get post put delete on it) </p>
 
 <h2>Deployed over Vercel with its configurations:</h2>
 BASE_URL) https://full-stack-blog-app-nextjs-1dqo.vercel.app/api
