@@ -5,6 +5,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  avatar: {
+    type: String,
+    required: false,
+  },
   email: {
     type: String,
     required: true,
@@ -19,6 +23,8 @@ const userSchema = new mongoose.Schema({
   newPassword: {
     type: String,
   },
+  resettoken: { type: String, required: false },
+  resettokenExpiration: { type: Date, required: false },
 });
 
 module.exports = mongoose.model("users", userSchema);

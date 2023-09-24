@@ -3,6 +3,10 @@ const sendResponse = require("../Helper/Helper");
 const userModel = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const sendEmail = require("../Helper/sendEmail");
+const generateRandomToken = require("../Helper/randomToken");
+const cloudinary = require("cloudinary").v2;
+const fs = require("fs").promises; // Import the 'fs' module to work with the file system
 
 const AuthController = {
   login: async (req, res) => {
@@ -120,6 +124,136 @@ const AuthController = {
           .status(404);
       }
     } catch (error) {}
+  },
+  uploadImage: async (req, res) => {
+    try {
+      if (!req.file) {
+        return res
+          .send(sendResponse(false, null, "No Image Selected to Upload"))
+          .status(400);
+      }
+
+      // Create a temporary file with a random name and write the buffer to it
+      const tempFilePath = `/tmp/${Math.random().toString(36).substring(2)}`;
+      await fs.writeFile(tempFilePath, req.file.buffer);
+
+      // Upload the temporary file to Cloudinary
+      const result = await cloudinary.uploader.upload(tempFilePath, {
+        resource_type: "auto",
+      });
+
+      // Delete the temporary file
+      await fs.unlink(tempFilePath);
+
+      // Return the Cloudinary URL as a response
+      res
+        .status(200)
+        .send(
+          sendResponse(
+            false,
+            result,
+            `Image Uploaded Successfully: ${result.secure_url}`
+          )
+        );
+    } catch (error) {
+      console.error("Image upload error:", error);
+      res.status(500).json({ error: "Image upload failed" });
+    }
+  },
+  forgotPassword: async (req, res) => {
+    try {
+      const { email } = req.body;
+      const userExist = await userModel.findOne({ email });
+      if (!userExist) {
+        return res
+          .send(
+            sendResponse(
+              false,
+              null,
+              "user with the provided email does not exist"
+            )
+          )
+          .status(404);
+      } else {
+        const token = generateRandomToken(5);
+        console.log(token);
+        userExist.resettoken = token;
+        userExist.resettokenExpiration = Date.now() + 3600000;
+        await userExist.save();
+        await sendEmail(
+          email,
+          "A Token send for Resetting Password for Trello App",
+          `Here is Your Reset Token ${token}`
+        );
+        res
+          .send(
+            sendResponse(
+              true,
+              userExist,
+              `A Confirmation Email send to ${email} with a Token to Reset Password`
+            )
+          )
+          .status(200);
+      }
+    } catch (error) {
+      res.send(sendResponse(false, null, "Internal Server Error")).status(400);
+    }
+  },
+  resetPassword: async (req, res) => {
+    try {
+      const { token, email, newPassword } = req.body;
+
+      const userExist = await userModel.findOne({ email });
+      if (!userExist) {
+        return res
+          .send(
+            sendResponse(
+              false,
+              null,
+              "user with the provided email does not exist"
+            )
+          )
+          .status(404);
+      } else {
+        if (userExist.resettoken !== token) {
+          return res
+            .send(sendResponse(false, null, "Enter Valid Token"))
+            .status(404);
+        }
+        if (userExist.resettokenExpiration < new Date()) {
+          return res
+            .send(sendResponse(false, null, "Token has Expired"))
+            .status(404);
+        }
+        if (userExist.password === newPassword) {
+          return res
+            .send(
+              sendResponse(
+                false,
+                null,
+                "This Password is Already Taken Try resending token email with different password"
+              )
+            )
+            .status(404);
+        }
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        userExist.password = hashedPassword;
+        userExist.resettoken = "";
+        userExist.resettokenExpiration = null;
+        await userExist.save();
+        res
+          .send(
+            sendResponse(
+              true,
+              userExist,
+              "Congratulations Password Reset Completed"
+            )
+          )
+          .status(200);
+      }
+    } catch (error) {
+      res.send(sendResponse(false, null, "Internal Server Error")).status(400);
+    }
   },
 };
 
