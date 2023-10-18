@@ -1,4 +1,4 @@
-# BackEnd-Projects-and-Practice-Exercises
+# BackEnd-Projects-and-Practice-Exercises (NOTE:ALL BELOW APIS ARE UNRESTRICTED FOR SHOWCASE PURPOSE , ONFIELD PROJECTS APIS ARE PROTECTED THROUGH MIDDLEWARE and SECRET KEY/TOKEN)
 It Includes Server Side Scripting Technologies Like : 
 - Express Js
 - Next Js
@@ -19,7 +19,7 @@ BASE_URL) https://backendtestapione.netlify.app/.netlify/functions/api/student
 <h2>Deployed over Cyclic with its configurations:</h2>
 BASE_URL) https://mushy-wasp-raincoat.cyclic.cloud/
 
-<p>EndPoints available : user , course , projects , tasks , teams (apply get post put delete on it) </p>
+<p>EndPoints available : api/user , api/course , api/projects , api/tasks , api/teams (apply get post put delete on it) </p>
 
 <h2>Deployed over Vercel with its configurations:</h2>
 BASE_URL) https://full-stack-blog-app-nextjs-1dqo.vercel.app/api
