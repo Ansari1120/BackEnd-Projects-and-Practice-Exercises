@@ -5,8 +5,8 @@ It Includes Server Side Scripting Technologies Like :
 - Next Js
 - Node js
 - Mongo Db
-- postgresql Database
-- Prisma orm
+- postgresql and Mysql Database
+- Prisma Orm
 - Drizzle Orm
 - brcyptjs for password hashing
 - jwt for authentication
