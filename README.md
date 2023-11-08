@@ -1,6 +1,6 @@
 # BackEnd-Projects-and-Practice-Exercises 
 ### <em>(NOTE:ALL BELOW APIS ARE UNRESTRICTED FOR SHOWCASE PURPOSE , ONFIELD PROJECTS APIS ARE PROTECTED THROUGH MIDDLEWARE and SECRET KEY/TOKEN)</em>
-It Includes Server Side Scripting Technologies Like : 
+It Includes Server Side Scripting Technologies includes : 
 - Express Js
 - Next Js
 - Node js
