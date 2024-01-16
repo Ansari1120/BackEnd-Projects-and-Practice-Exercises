@@ -9,6 +9,45 @@ const cloudinary = require("cloudinary").v2;
 const fs = require("fs").promises; // Import the 'fs' module to work with the file system
 
 const AuthController = {
+  registerUser:async(req,res)=>{
+    const { userName, email, password } = req.body;
+  const obj = { userName, email, password };
+  let requiredArr = ["userName", "email", "password"];
+  let errArr = [];
+
+  requiredArr.forEach((x) => {
+    if (!obj[x]) {
+      errArr.push(x);
+    }
+  });
+
+  if (errArr.length > 0) {
+    res
+      .send(sendResponse(false, null, "Some Fileds are Missing", errArr))
+      .status(400);
+    return;
+  } else {
+    let hashPassword = await bcrypt.hash(obj.password, 10);
+    obj.password = hashPassword;
+
+    const existingUser = await userModel.findOne({ email });
+    if (existingUser) {
+      res
+        .send(sendResponse(false, null, "This Email is Already Exist"))
+        .status(403);
+    } else {
+      userModel.create(obj)
+        .then((result) => {
+          res.send(sendResponse(true, result, "User Saved Successfully"));
+        })
+        .catch((err) => {
+          res
+            .send(sendResponse(false, err, "Internal Server Error"))
+            .status(400);
+        });
+    }
+  }
+  },
   login: async (req, res) => {
     const { email, password } = req.body;
     const obj = { email, password };
@@ -27,7 +66,7 @@ const AuthController = {
         res.send(sendResponse(false, null, "Credential Error"));
       }
     } else {
-      res.send(sendResponse(false, err, "User Doesn't Exist"));
+      res.send(sendResponse(false, null, "User Doesn't Exist"));
     }
   },
   getUsers: async (req, res) => {
@@ -36,9 +75,14 @@ const AuthController = {
       .then((result) => {
         res.send(sendResponse(true, result));
       })
-      .catch((err) => {});
+      .catch((err) => {
+        console.log(err);
+        res.send(sendResponse(false, err, "Failed to retrieve users"));
+      });
   },
   protected: async (req, res, next) => {
+    //check if user with the provided token exist?
+    //and return response in the api with decoded user info
     let token = req.headers.authorization;
     if (token) {
       token = token.split(" ")[1];
@@ -220,6 +264,11 @@ const AuthController = {
             .send(sendResponse(false, null, "Enter Valid Token"))
             .status(404);
         }
+        //the scenario is handled as token is valid for 24 hours
+        //if token's date and time object is earlier (>)
+        //then the current date an time then user's token is proven
+        //to be valid as per 24 hrs setteld in jwt. otherwise it is
+        //clear that token is expired and password cannot be reset.
         if (userExist.resettokenExpiration < new Date()) {
           return res
             .send(sendResponse(false, null, "Token has Expired"))
@@ -253,6 +302,55 @@ const AuthController = {
       }
     } catch (error) {
       res.send(sendResponse(false, null, "Internal Server Error")).status(400);
+    }
+  },
+  editProfile: async (req, res) => {
+    try {
+      let id = req.params.id;
+      let { userName, avatar, email } = req.body;
+      let result = await userModel.findById(id);
+      if (!result) {
+        return res
+          .status(404)
+          .send(
+            sendResponse(false, null, "User not found with the given params id")
+          );
+      } else {
+        if (!avatar || avatar === "") {
+          avatar =
+            "https://extendedevolutionarysynthesis.com/wp-content/uploads/2018/02/avatar-1577909_960_720.png";
+        }
+        let updateProfile = await userModel.findByIdAndUpdate(
+          id,
+          { userName, avatar, email },
+          { new: true }
+        );
+        if (!updateProfile) {
+          return res
+            .status(400)
+            .send(
+              sendResponse(
+                false,
+                null,
+                "Something went wrong while updating user credentials, kindly recheck payload key values type and key spelling."
+              )
+            );
+        } else {
+          return res
+            .status(200)
+            .send(
+              sendResponse(
+                true,
+                updateProfile,
+                "Credentials Updated Successfully!"
+              )
+            );
+        }
+      }
+    } catch (error) {
+      return res
+        .status(500)
+        .send(sendResponse(false, null, "Internal Server Error"));
     }
   },
 };
