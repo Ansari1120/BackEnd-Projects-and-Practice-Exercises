@@ -24,6 +24,7 @@ route.get("/test", AuthController.protected);
 route.get("/", AuthController.getUsers);
 route.post("/signup", AuthController.registerUser);
 route.post("/login", AuthController.login);
+route.post("/confirmUserRegistration", AuthController.confirmRegistration);
 route.post("/");
 route.post("/upload", upload.single("image"), AuthController.uploadImage);
 route.post("/changePassword", AuthController.changePassword);

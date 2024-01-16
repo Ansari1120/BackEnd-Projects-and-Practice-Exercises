@@ -4,49 +4,71 @@ const userModel = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../Helper/sendEmail");
+const sendSMS = require("../Helper/sendSms");
 const generateRandomToken = require("../Helper/randomToken");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs").promises; // Import the 'fs' module to work with the file system
 
 const AuthController = {
-  registerUser:async(req,res)=>{
+  registerUser: async (req, res) => {
     const { userName, email, password } = req.body;
-  const obj = { userName, email, password };
-  let requiredArr = ["userName", "email", "password"];
-  let errArr = [];
+    const obj = { userName, email, password };
+    let requiredArr = ["userName", "email", "password"];
+    let errArr = [];
 
-  requiredArr.forEach((x) => {
-    if (!obj[x]) {
-      errArr.push(x);
-    }
-  });
+    requiredArr.forEach((x) => {
+      if (!obj[x]) {
+        errArr.push(x);
+      }
+    });
 
-  if (errArr.length > 0) {
-    res
-      .send(sendResponse(false, null, "Some Fileds are Missing", errArr))
-      .status(400);
-    return;
-  } else {
-    let hashPassword = await bcrypt.hash(obj.password, 10);
-    obj.password = hashPassword;
-
-    const existingUser = await userModel.findOne({ email });
-    if (existingUser) {
+    if (errArr.length > 0) {
       res
-        .send(sendResponse(false, null, "This Email is Already Exist"))
-        .status(403);
+        .send(sendResponse(false, null, "Some Fileds are Missing", errArr))
+        .status(400);
+      return;
     } else {
-      userModel.create(obj)
-        .then((result) => {
-          res.send(sendResponse(true, result, "User Saved Successfully"));
-        })
-        .catch((err) => {
-          res
-            .send(sendResponse(false, err, "Internal Server Error"))
-            .status(400);
-        });
+      let hashPassword = await bcrypt.hash(obj.password, 10);
+      const existingUser = await userModel.findOne({ email });
+      const token = generateRandomToken(5);
+      console.log(token);
+
+      obj.password = hashPassword;
+      obj.avatar =
+        "https://extendedevolutionarysynthesis.com/wp-content/uploads/2018/02/avatar-1577909_960_720.png";
+      obj.resettoken = token;
+      obj.resettokenExpiration = Date.now() + 3600000;
+      if (existingUser) {
+        res
+          .send(sendResponse(false, null, "This Email is Already Exist"))
+          .status(403);
+      } else {
+        await sendEmail(
+          email,
+          "A Token sent for confirming registration of the user in ABC App. Remember the token will expire after an hour.",
+          `Here is Your confirmation Token ${token}`
+        );
+        userModel
+          .create(obj)
+          .then((result) => {
+            console.log(result);
+            res
+              .send(
+                sendResponse(
+                  true,
+                  result,
+                  `A Confirmation Email sent to ${email} with a Token to confirm user registration`
+                )
+              )
+              .status(200);
+          })
+          .catch((err) => {
+            res
+              .send(sendResponse(false, err, "Internal Server Error"))
+              .status(400);
+          });
+      }
     }
-  }
   },
   login: async (req, res) => {
     const { email, password } = req.body;
@@ -67,6 +89,66 @@ const AuthController = {
       }
     } else {
       res.send(sendResponse(false, null, "User Doesn't Exist"));
+    }
+  },
+  confirmRegistration: async (req, res) => {
+    try {
+      const { token, email } = req.body;
+      const userExist = await userModel.findOne({ email });
+      if (!userExist) {
+        return res
+          .send(
+            sendResponse(
+              false,
+              null,
+              "Please provide the same email you used for registring this account."
+            )
+          )
+          .status(404);
+      } else {
+        if (userExist.resettoken !== token) {
+          console.log("saved one", userExist.resettoken, "input one", token);
+          return res
+            .send(sendResponse(false, null, "Enter Valid Token"))
+            .status(404);
+        }
+        //the scenario is handled as token is valid for 24 hours
+        //if token's date and time object is earlier (>)
+        //then the current date an time then user's token is proven
+        //to be valid as per 24 hrs setteld in jwt. otherwise it is
+        //clear that token is expired and password cannot be reset.
+        if (userExist.resettokenExpiration < new Date()) {
+          return res
+            .send(sendResponse(false, null, "Token has Expired"))
+            .status(404);
+        }
+        if (userExist.registrationStatus) {
+          return res
+            .send(
+              sendResponse(
+                false,
+                null,
+                "Your Account registration is already confirmed"
+              )
+            )
+            .status(404);
+        }
+        userExist.registrationStatus = true;
+        userExist.resettoken = "";
+        userExist.resettokenExpiration = null;
+        await userExist.save();
+        res
+          .send(
+            sendResponse(
+              true,
+              userExist,
+              "Congratulations Account Registraion Completed,now you can login to ABC App."
+            )
+          )
+          .status(200);
+      }
+    } catch (error) {
+      res.send(sendResponse(false, null, "Internal Server Error")).status(400);
     }
   },
   getUsers: async (req, res) => {
@@ -206,7 +288,7 @@ const AuthController = {
   },
   forgotPassword: async (req, res) => {
     try {
-      const { email } = req.body;
+      const { email, number, mode } = req.body;
       const userExist = await userModel.findOne({ email });
       if (!userExist) {
         return res
@@ -224,17 +306,44 @@ const AuthController = {
         userExist.resettoken = token;
         userExist.resettokenExpiration = Date.now() + 3600000;
         await userExist.save();
-        await sendEmail(
-          email,
-          "A Token send for Resetting Password for Trello App",
-          `Here is Your Reset Token ${token}`
-        );
+        if (!mode) {
+          return res
+            .send(
+              sendResponse(
+                false,
+                null,
+                "please select mode of send verification token, either sms or email"
+              )
+            )
+            .status(404);
+        }
+        if (mode == "email") {
+          await sendEmail(
+            email,
+            "A Token sent for Resetting Password for Abc App",
+            `Here is Your Reset Token ${token}`
+          );
+        } else {
+          if (!number) {
+            return res
+              .send(sendResponse(false, null, "Fill the number field"))
+              .status(404);
+          }
+          console.log("here is number");
+          await sendSMS(
+            number,
+            "A Token sent for Resetting Password for ABC App",
+            `Here is Your Reset Token ${token}`
+          );
+        }
         res
           .send(
             sendResponse(
               true,
               userExist,
-              `A Confirmation Email send to ${email} with a Token to Reset Password`
+              `A Confirmation ${mode === "email" ? "email" : "sms"} send to ${
+                mode === "email" ? email : number
+              } with a Token to Reset Password`
             )
           )
           .status(200);

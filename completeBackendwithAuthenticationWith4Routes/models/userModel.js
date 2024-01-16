@@ -23,6 +23,10 @@ const userSchema = new mongoose.Schema({
   newPassword: {
     type: String,
   },
+  registrationStatus: {
+    type: Boolean,
+    default: false,
+  },
   resettoken: { type: String, required: false },
   resettokenExpiration: { type: Date, required: false },
 });
