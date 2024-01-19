@@ -27,6 +27,23 @@ route.get("/", async (req, res) => {
   }
 });
 
+route.get("/search", async (req, res) => {
+  let { firstName, lastName } = req.query;
+  try {
+    let result = await StudentModel.find({
+      firstName: firstName,
+      lastName: lastName,
+    });
+    if (!result) {
+      return res.send(sendResponse(false, null, "No Data Found")).status(404);
+    } else {
+      res.status(200).send(sendResponse(true, result, "Data found"));
+    }
+  } catch (e) {
+    res.send(sendResponse(false, null, "Internal Server Error")).status(400);
+  }
+});
+
 route.get("/:id", async (req, res) => {
   try {
     let id = req.params.id;
@@ -43,26 +60,10 @@ route.get("/:id", async (req, res) => {
   }
 });
 
-route.get("/search", async (req, res) => {
-  let { firstName, lastName } = req.body;
-  try {
-    let result = await StudentModel.find({
-      firstName: firstName,
-      lastName: lastName,
-    });
-    if (!result) {
-      res.send(sendResponse(false, null, "No Data Found")).status(404);
-    } else {
-      res.send(sendResponse(true, result), "Data found").status(200);
-    }
-  } catch (e) {
-    res.send(sendResponse(false, null, "Internal Server Error")).status(400);
-  }
-});
-
 route.post("/", async (req, res) => {
   let { firstName, lastName, email, password, contact } = req.body;
   try {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     let errArr = [];
 
     //validation Part
@@ -77,6 +78,12 @@ route.post("/", async (req, res) => {
     }
     if (!contact) {
       errArr.push("Required contact");
+    }
+    if (contact.length <= 10) {
+      errArr.push("Numbers in contact should be greater then or equal to 10.");
+    }
+    if (!emailRegex.test(email)) {
+      errArr.push("Invalid Email Address");
     }
 
     if (errArr.length > 0) {

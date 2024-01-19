@@ -8,6 +8,9 @@ const sendSMS = require("../Helper/sendSms");
 const generateRandomToken = require("../Helper/randomToken");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs").promises; // Import the 'fs' module to work with the file system
+const multer = require("multer");
+const upload = multer().single("avatar"); // 'avatar' should be the name of the field in FormData
+const path = require("path");
 
 const AuthController = {
   registerUser: async (req, res) => {
@@ -155,31 +158,37 @@ const AuthController = {
     userModel
       .find()
       .then((result) => {
-        res.send(sendResponse(true, result));
+        res.send(sendResponse(true, result)).status(200);
       })
       .catch((err) => {
         console.log(err);
-        res.send(sendResponse(false, err, "Failed to retrieve users"));
+        res
+          .send(sendResponse(false, err, "Failed to retrieve users"))
+          .status(404);
       });
   },
   protected: async (req, res, next) => {
-    //check if user with the provided token exist?
-    //and return response in the api with decoded user info
+    // Check if a user with the provided token exists
+    // and return the response in the API with decoded user info
+
     let token = req.headers.authorization;
     if (token) {
       token = token.split(" ")[1];
       jwt.verify(token, process.env.SECURE_KEY, (err, decode) => {
         if (err) {
-          res.send(sendResponse(false, null, "Unauthorized")).status(403);
+          return res
+            .send(sendResponse(false, null, "Unauthorized"))
+            .status(403);
         } else {
           console.log(decode);
-          next();
+          res.send(sendResponse(true, decode, "Authorized")).status(200);
         }
       });
     } else {
-      res.send(sendResponse(false, null, "Server internal Error")).status(400);
+      res.status(400).send(sendResponse(false, null, "Server internal Error"));
     }
   },
+
   adminProtected: async (req, res, next) => {
     let token = req.headers.authorization;
     token = token.split(" ")[1];
@@ -199,23 +208,36 @@ const AuthController = {
   },
   changePassword: async (req, res) => {
     try {
+      let token = req.headers.authorization;
       const { email, newPassword, oldPassword } = req.body;
-
       const user = await userModel.findOne({ email: email });
 
-      if (user) {
-        const passwordValid = bcrypt.compare(oldPassword, user.password);
-        if (!passwordValid) {
-          res
-            .send(sendResponse(false, null, "Old Password is Wrong"))
-            .status(404);
-        }
-        const newhashPassword = await bcrypt.hash(newPassword, 12);
-        user.password = newhashPassword;
-        await user.save();
-        res.send(sendResponse(true, user, "Password is Changed !")).status(200);
-      } else {
-        res.send(sendResponse(false, null, "user not found !")).status(404);
+      if (token) {
+        token = token.split(" ")[1];
+        jwt.verify(token, process.env.SECURE_KEY, async (err, decode) => {
+          if (err) {
+            res.send(sendResponse(false, null, "Unauthorized")).status(403);
+          } else {
+            if (user) {
+              const passwordValid = bcrypt.compare(oldPassword, user.password);
+              if (!passwordValid) {
+                res
+                  .send(sendResponse(false, null, "Old Password is Wrong"))
+                  .status(404);
+              }
+              const newhashPassword = await bcrypt.hash(newPassword, 12);
+              user.password = newhashPassword;
+              await user.save();
+              res
+                .send(sendResponse(true, user, "Password is Changed !"))
+                .status(200);
+            } else {
+              res
+                .send(sendResponse(false, null, "user not found !"))
+                .status(404);
+            }
+          }
+        });
       }
     } catch (error) {
       res.send(sendResponse(false, error, "Internal Server Error")).status(400);
@@ -336,17 +358,19 @@ const AuthController = {
             `Here is Your Reset Token ${token}`
           );
         }
-        res
-          .send(
-            sendResponse(
-              true,
-              userExist,
-              `A Confirmation ${mode === "email" ? "email" : "sms"} send to ${
-                mode === "email" ? email : number
-              } with a Token to Reset Password`
+        (userExist.resettoken = null),
+          (userExist.resettokenExpiration = null),
+          res
+            .send(
+              sendResponse(
+                true,
+                userExist,
+                `A Confirmation ${mode === "email" ? "email" : "sms"} send to ${
+                  mode === "email" ? email : number
+                } with a Token to Reset Password`
+              )
             )
-          )
-          .status(200);
+            .status(200);
       }
     } catch (error) {
       res.send(sendResponse(false, null, "Internal Server Error")).status(400);
