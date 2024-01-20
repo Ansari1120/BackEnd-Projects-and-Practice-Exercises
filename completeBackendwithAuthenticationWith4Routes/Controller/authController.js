@@ -1,6 +1,8 @@
 const { decode } = require("jsonwebtoken");
 const sendResponse = require("../Helper/Helper");
 const userModel = require("../models/userModel");
+const imageUpload = require("../Helper/uploadImageToServer");
+const handleUserRegister = require("../Helper/registerUserDynamicHandling");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../Helper/sendEmail");
@@ -9,68 +11,51 @@ const generateRandomToken = require("../Helper/randomToken");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs").promises; // Import the 'fs' module to work with the file system
 const multer = require("multer");
-const upload = multer().single("avatar"); // 'avatar' should be the name of the field in FormData
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 const path = require("path");
 
 const AuthController = {
   registerUser: async (req, res) => {
-    const { userName, email, password } = req.body;
-    const obj = { userName, email, password };
-    let requiredArr = ["userName", "email", "password"];
-    let errArr = [];
+    try {
+      const contentType = req.headers["content-type"];
 
-    requiredArr.forEach((x) => {
-      if (!obj[x]) {
-        errArr.push(x);
-      }
-    });
+      if (contentType.includes("multipart/form-data")) {
+        // Handle 'multipart/form-data' (file upload)
+        upload.single("avatar")(req, res, async (err) => {
+          if (err) {
+            return res
+              .status(400)
+              .send(sendResponse(false, null, "File upload failed"));
+          }
 
-    if (errArr.length > 0) {
-      res
-        .send(sendResponse(false, null, "Some Fileds are Missing", errArr))
-        .status(400);
-      return;
-    } else {
-      let hashPassword = await bcrypt.hash(obj.password, 10);
-      const existingUser = await userModel.findOne({ email });
-      const token = generateRandomToken(5);
-      console.log(token);
+          // Check if an image file is present in the request
+          if (req.file) {
+            const avatarUrl = await imageUpload(req.file.buffer);
+            req.body.avatar = avatarUrl;
+          }
 
-      obj.password = hashPassword;
-      obj.avatar =
-        "https://extendedevolutionarysynthesis.com/wp-content/uploads/2018/02/avatar-1577909_960_720.png";
-      obj.resettoken = token;
-      obj.resettokenExpiration = Date.now() + 3600000;
-      if (existingUser) {
-        res
-          .send(sendResponse(false, null, "This Email is Already Exist"))
-          .status(403);
+          // Continue with user registration logic (JSON data or with updated avatar URL)
+          await handleUserRegister(req, res);
+        });
+      } else if (contentType.includes("application/json")) {
+        // Handle 'application/json' (JSON data)
+        // Assuming the JSON payload is in the request body
+        req.body.avatar =
+          "https://extendedevolutionarysynthesis.com/wp-content/uploads/2018/02/avatar-1577909_960_720.png"; // Set a default avatar URL if needed
+
+        // Continue with user registration logic (JSON data or with default avatar URL)
+        await handleUserRegister(req, res);
       } else {
-        await sendEmail(
-          email,
-          "A Token sent for confirming registration of the user in ABC App. Remember the token will expire after an hour.",
-          `Here is Your confirmation Token ${token}`
-        );
-        userModel
-          .create(obj)
-          .then((result) => {
-            console.log(result);
-            res
-              .send(
-                sendResponse(
-                  true,
-                  result,
-                  `A Confirmation Email sent to ${email} with a Token to confirm user registration`
-                )
-              )
-              .status(200);
-          })
-          .catch((err) => {
-            res
-              .send(sendResponse(false, err, "Internal Server Error"))
-              .status(400);
-          });
+        // Unsupported content type
+        res
+          .status(400)
+          .send(sendResponse(false, null, "Unsupported Content-Type"));
       }
+    } catch (error) {
+      res
+        .status(500)
+        .send(sendResponse(false, null, "User registration failed"));
     }
   },
   login: async (req, res) => {
@@ -78,6 +63,11 @@ const AuthController = {
     const obj = { email, password };
     console.log(obj);
     let result = await userModel.findOne({ email });
+    if (!result.registrationStatus) {
+      res.send(
+        sendResponse(false, null, "Please Confirm Registration of User First.")
+      );
+    }
     if (result) {
       let isConfirm = await bcrypt.compare(obj.password, result.password);
       if (isConfirm) {
@@ -188,7 +178,6 @@ const AuthController = {
       res.status(400).send(sendResponse(false, null, "Server internal Error"));
     }
   },
-
   adminProtected: async (req, res, next) => {
     let token = req.headers.authorization;
     token = token.split(" ")[1];
@@ -281,8 +270,16 @@ const AuthController = {
           .status(400);
       }
 
+      // Create the 'tmp' directory if it doesn't exist
+      const tmpDir = path.join(__dirname, "tmp");
+      await fs.mkdir(tmpDir, { recursive: true });
+
       // Create a temporary file with a random name and write the buffer to it
-      const tempFilePath = `/tmp/${Math.random().toString(36).substring(2)}`;
+      const tempFilePath = path.join(
+        tmpDir,
+        `${Math.random().toString(36).substring(2)}`
+      );
+
       await fs.writeFile(tempFilePath, req.file.buffer);
 
       // Upload the temporary file to Cloudinary

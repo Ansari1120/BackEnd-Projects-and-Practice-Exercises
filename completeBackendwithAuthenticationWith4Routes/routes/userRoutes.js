@@ -8,6 +8,7 @@ const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 var dotenv = require("dotenv");
 dotenv.config();
+const authMiddleware = require("../Helper/middleware");
 
 // Multer storage configuration (memory storage)
 const storage = multer.memoryStorage();
@@ -21,9 +22,10 @@ cloudinary.config({
 });
 
 route.get("/test", AuthController.protected);
-route.get("/", AuthController.getUsers);
 route.post("/signup", AuthController.registerUser);
 route.post("/login", AuthController.login);
+route.use(authMiddleware);
+route.get("/", AuthController.getUsers);
 route.post("/confirmUserRegistration", AuthController.confirmRegistration);
 route.post("/");
 route.post("/upload", upload.single("image"), AuthController.uploadImage);
