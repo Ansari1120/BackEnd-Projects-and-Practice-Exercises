@@ -14,6 +14,7 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 const path = require("path");
+const whatsApp = require("../Helper/whatsAppVerification");
 
 const AuthController = {
   registerUser: async (req, res) => {
@@ -341,6 +342,17 @@ const AuthController = {
             email,
             "A Token sent for Resetting Password for Abc App",
             `Here is Your Reset Token ${token}`
+          );
+        } else if (mode == "whatsapp") {
+          if (!number) {
+            return res
+              .send(sendResponse(false, null, "Fill the number field"))
+              .status(404);
+          }
+
+          await whatsApp(
+            number,
+            `A Token sent for Resetting Password for ABC App.Here is Your Reset Token ${token}`
           );
         } else {
           if (!number) {

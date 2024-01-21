@@ -13,13 +13,14 @@ const authMiddleware = (req, res, next) => {
   }
 
   // Check for the presence of authentication token in headers
-  const authToken = req.headers["authorization"];
+  let authToken = req.headers["authorization"];
   if (!authToken) {
     return res
       .status(401)
       .send(sendResponse(false, null, "Authentication token is missing"));
   }
 
+  authToken = authToken.split(" ")[1];
   // Verify the authentication token
   jwt.verify(authToken, process.env.SECURE_KEY, (err, decoded) => {
     if (err) {
