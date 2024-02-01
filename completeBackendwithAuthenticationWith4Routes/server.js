@@ -113,6 +113,7 @@
 
 const express = require("express");
 const mongoose = require("mongoose");
+const path = require("path");
 const cors = require("cors");
 require("dotenv").config();
 const StudentRouter = require("./routes/studentRouter");
@@ -123,6 +124,11 @@ const userRoutes = require("./routes/userRoutes");
 const app = express();
 app.use(express.json());
 app.use(cors());
+// Serve static files from the "storage" directory
+app.use("/storage", express.static(path.join(__dirname, "storage")));
+
+// ... your other routes
+
 app.use("/api/student", StudentRouter);
 app.use("/api/teacher", TeacherRouter);
 app.use("/api/institute", InstituteRouter);
@@ -131,6 +137,11 @@ app.use("/api/user", userRoutes);
 
 app.get("/", (req, res) => {
   res.send("Server Started");
+});
+
+// Make sure to include this route to handle other routes
+app.get("*", (req, res) => {
+  res.status(404).send("Not Found");
 });
 
 mongoose

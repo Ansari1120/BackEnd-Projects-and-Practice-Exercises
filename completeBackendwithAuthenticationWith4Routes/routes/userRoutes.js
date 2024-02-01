@@ -9,6 +9,7 @@ const cloudinary = require("cloudinary").v2;
 var dotenv = require("dotenv");
 dotenv.config();
 const authMiddleware = require("../Helper/middleware");
+const { uploader } = require("../Helper/fileUploadHelper");
 
 // Multer storage configuration (memory storage)
 const storage = multer.memoryStorage();
@@ -29,6 +30,11 @@ route.get("/", AuthController.getUsers);
 route.post("/confirmUserRegistration", AuthController.confirmRegistration);
 route.post("/");
 route.post("/upload", upload.single("image"), AuthController.uploadImage);
+route.post(
+  "/uploadFile",
+  uploader.array("files"),
+  AuthController.fileUploaderController
+);
 route.post("/changePassword", AuthController.changePassword);
 route.post("/forgotPassword", AuthController.forgotPassword);
 route.post("/resetPassword", AuthController.resetPassword);

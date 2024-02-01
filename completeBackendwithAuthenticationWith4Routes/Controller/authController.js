@@ -15,6 +15,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 const path = require("path");
 const whatsApp = require("../Helper/whatsAppVerification");
+const { HandleFileUpload } = require("../Helper/fileUploadHelper");
 
 const AuthController = {
   registerUser: async (req, res) => {
@@ -30,7 +31,8 @@ const AuthController = {
               .send(sendResponse(false, null, "File upload failed"));
           }
 
-          // Check if an image file is present in the request
+          // Check if an image file is present in the request uploa image to third party
+          //server service i.e cloudinary
           if (req.file) {
             const avatarUrl = await imageUpload(req.file.buffer);
             req.body.avatar = avatarUrl;
@@ -495,6 +497,20 @@ const AuthController = {
         .send(sendResponse(false, null, "Internal Server Error"));
     }
   },
+  fileUploaderController: async (req, res, next) => {
+    try {
+      let { files, success, message } = await HandleFileUpload(req, res, next);
+  
+      if (success) {
+        res.status(200).send(sendResponse(true, files, message));
+      } else {
+        res.status(400).send(sendResponse(false, null, message));
+      }
+    } catch (error) {
+      res.status(500).send(sendResponse(false, error, "Internal Server Error"));
+    }
+  },
+  
 };
 
 module.exports = AuthController;

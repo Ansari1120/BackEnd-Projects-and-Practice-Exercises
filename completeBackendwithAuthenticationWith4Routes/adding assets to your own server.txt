@@ -1,0 +1,63 @@
+const express = require('express');
+const multer = require('multer');
+const mongoose = require('mongoose');
+const path = require('path');
+
+const app = express();
+const PORT = 3000;
+
+// MongoDB setup (you need to replace your connection string and model)
+mongoose.connect('mongodb://your-mongo-db-url/your-database', { useNewUrlParser: true, useUnifiedTopology: true });
+
+const userSchema = new mongoose.Schema({
+  name: String,
+  username: String,
+  email: String,
+  password: String,
+  avatar: String,
+});
+
+const User = mongoose.model('User', userSchema);
+
+// Multer configuration
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); // Specify the directory where files will be stored
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage: storage });
+
+// Serve uploaded files statically
+app.use('/fileFolder/asset', express.static('uploads'));
+
+// Handle file upload
+app.post('/upload', upload.single('avatar'), async (req, res) => {
+  try {
+    // Construct the URL based on your server structure
+    const fileUrl = `http://yourserver.com/fileFolder/asset/${req.file.filename}`;
+
+    // Save fileUrl in MongoDB along with other user details
+    const newUser = new User({
+      name: req.body.name,
+      username: req.body.username,
+      email: req.body.email,
+      password: req.body.password,
+      avatar: fileUrl,
+    });
+
+    await newUser.save();
+
+    res.json({ success: true, fileUrl });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Internal Server Error' });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
