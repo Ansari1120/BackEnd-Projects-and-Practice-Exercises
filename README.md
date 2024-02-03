@@ -58,3 +58,17 @@ BASE_URL) https://full-stack-blog-app-nextjs-1dqo.vercel.app/api
 BASE_URL) https://render-deploy-23ts.onrender.com/
 
 <p>EndPoints available : api/user , api/course , api/projects , api/tasks , api/teams (apply get post put delete on it) </p>
+
+### <em>(NOTE:BELOW APIS ARE RESTRICTED ,  PROTECTED THROUGH MIDDLEWARE and SECRET KEY/TOKEN)</em>
+
+<h2>Deployed over Render a postbuild backend template (ready to use with realworld app's backend):</h2>
+BASE_URL) https://nodemongobackendapisbyahmed.onrender.com/
+
+<p>EndPoints available : api/user , api/course , api/teachers , api/intitutes (apply get post put delete on it) </p>
+
+<p>key : api-key , value : ahshfabsdfbasbdbfbasd (put it in header) </p>
+<p>all routes are proctected you need to login first and then copy login token and past it in authorization bearer token to access apis.</p>
+<p>Example user : faisalhanan926@gmail.com , password : abc123</p>
+<p>Testing Collection : https://api.postman.com/collections/27123210-e17bf013-1bec-4786-84ff-cbdc1a06ef9b?access_key=PMAT-01HMJ005KKWNQHKKH5F51GRM32</p>
+
+
