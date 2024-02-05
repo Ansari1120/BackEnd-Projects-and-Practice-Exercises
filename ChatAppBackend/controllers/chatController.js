@@ -6,7 +6,7 @@ const accessChat = asyncHandler(async (req, res) => {
   //api for one on one chat.
   const { recipientId } = req.body;
   if (!recipientId) {
-    console.log("Recipient id param does not send with request");
+    console.log("Recipient id does not send with request");
     return res.status(400).send({
       status: 400,
       message: "Recipient id does not send with request",
@@ -36,9 +36,18 @@ const accessChat = asyncHandler(async (req, res) => {
       data: isChat[0],
     });
   } else {
+    const recipientData = await User.findById(recipientId);
+    console.log("Recipient name", recipientData);
+
+    if (!recipientData) {
+      return res.status(400).send({
+        status: 400,
+        message: `Cannot retreive user you selected to chat with.`,
+      });
+    }
     //create a new chat if it does not exist between this two. like create a chat room first time.
     let chatData = {
-      chatName: "sender",
+      chatName: `${recipientData.name}`,
       isGroupChat: false,
       users: [req.user._id, recipientId],
     };
