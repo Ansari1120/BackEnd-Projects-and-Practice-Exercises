@@ -64,12 +64,17 @@ const loginUser = asyncHanlder(async (req, res) => {
   const user = await User.findOne({ email });
 
   if (user && (await user.matchPassword(password))) {
-    res.status(200).json({
+    const data = {
       _id: user._id,
       name: user.name,
       email: user.email,
       profilePicture: user.profilePicture,
       token: generateToken(user._id),
+    };
+    res.status(200).send({
+      status: 200,
+      message: `Welcome Back Dear ${data.name}`,
+      data: data,
     });
   } else {
     res.status(401).json({
