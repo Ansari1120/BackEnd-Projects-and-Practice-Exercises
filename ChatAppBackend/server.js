@@ -22,6 +22,7 @@ app.get("/", (req, res) => {
 
 connectDB()
   .then(() => {
+    const users = [];
     const server = app.listen(process.env.PORT, () => {
       console.log(`Server is Listning to the PORT : ${process.env.PORT}`);
     });
@@ -37,6 +38,11 @@ connectDB()
       socket.on("setup", (userData) => {
         socket.join(userData._id);
         console.log("user of id joins application :", userData._id);
+        // onlineUsers[userData._id] = {
+        //   socketId: socket.id,
+        //   lastActivity: Date.now(),
+        // };
+        // socket.emit("userStatus", { userId: userData._id, status: "online" }); // Notify all users about online status
         socket.emit("connected");
       });
 
@@ -63,8 +69,86 @@ connectDB()
         });
       });
 
-      socket.off("setup", (userData) => {
+      const userIds = new Set();
+
+      // Listen for status updates from clients
+      // Listen for status updates from clients
+      socket.on("status", (userData) => {
+        console.log("User status:", userData._id);
+        if (!userData || !userData._id) {
+          console.error("Invalid userData received:", userData);
+          return;
+        }
+        // Check if the user already exists in the users array
+        const existingUserIndex = users.findIndex(
+          (user) => user.userID === userData._id
+        );
+
+        // If the user exists, update their status
+        if (existingUserIndex !== -1) {
+          users[existingUserIndex].status = "online";
+        } else {
+          // If the user doesn't exist, add them to the users array
+          users.push({
+            status: "online",
+            userID: userData._id,
+          });
+        }
+
+        // Emit the updated online users list to everyone except the sender
+        console.log("Users status:", users);
+        socket.broadcast.emit("users", users);
+      });
+
+      socket.on("manualStatusUpdate", (userData) => {
+        // users.delete(userData._id);
+        users.push({
+          status: "offline",
+          lastSeen: Date.now(),
+          userID: userData._id,
+        });
+        io.emit("users", users);
+      });
+      //careate socket.on (online)
+      //recieve user id and store it in the array of online
+      //emit an event of array containing online.
+      //implement an activtiy indicator to auto offline user and remove it from online array
+
+      // socket.on("disconnect", () => {
+      //   for (const userId in onlineUsers) {
+      //     if (onlineUsers[userId].socketId === socket.id) {
+      //       const user = onlineUsers[userId];
+      //       delete onlineUsers[userId];
+      //       io.emit("userStatus", {
+      //         userId,
+      //         status: "offline",
+      //         lastActivity: user.lastActivity,
+      //       });
+      //       break;
+      //     }
+      //   }
+      //   console.log("User disconnected");
+      // });
+
+      // socket.on("heartbeat", () => {
+      //   for (const userId in onlineUsers) {
+      //     if (onlineUsers[userId].socketId === socket.id) {
+      //       onlineUsers[userId].lastActivity = Date.now();
+      //       break;
+      //     }
+      //   }
+      // });
+
+      socket.off("setup-off", (userData) => {
         console.log("user disconnected");
+        const user = onlineUsers[userData._id];
+
+        delete onlineUsers[userData._id]; // Remove user from online users
+        io.emit("userStatus", {
+          userId: userData._id,
+          status: `offline`,
+          lastActivity: user.lastActivity,
+        });
         socket.leave(userData._id);
       });
     });
