@@ -22,7 +22,7 @@ app.get("/", (req, res) => {
 
 connectDB()
   .then(() => {
-    const users = [];
+    let users = [];
     const server = app.listen(process.env.PORT, () => {
       console.log(`Server is Listning to the PORT : ${process.env.PORT}`);
     });
@@ -97,16 +97,27 @@ connectDB()
 
         // Emit the updated online users list to everyone except the sender
         console.log("Users status:", users);
-        socket.broadcast.emit("users", users);
+        io.emit("users", users);
       });
 
       socket.on("manualStatusUpdate", (userData) => {
         // users.delete(userData._id);
-        users.push({
-          status: "offline",
-          lastSeen: Date.now(),
-          userID: userData._id,
-        });
+
+        // Check if the user already exists in the users array
+        const existingUserIndex = users.findIndex(
+          (user) => user.userID === userData._id
+        );
+
+        // If the user exists, update their status
+        if (existingUserIndex !== -1) {
+          users[existingUserIndex].status = "offline";
+          users[existingUserIndex].lastSeen = Date.now();
+        }
+        // users.push({
+        //   status: "offline",
+        //   lastSeen: Date.now(),
+        //   userID: userData._id,
+        // });
         io.emit("users", users);
       });
       //careate socket.on (online)
