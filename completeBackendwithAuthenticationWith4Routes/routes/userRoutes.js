@@ -29,7 +29,9 @@ route.use(authMiddleware);
 route.get("/", AuthController.getUsers);
 route.post("/confirmUserRegistration", AuthController.confirmRegistration);
 route.post("/");
+//upload any type of asset to Cloudinary Service and get live url of your asset.
 route.post("/upload", upload.single("image"), AuthController.uploadImage);
+//upload any type of asset i.e pdf,video,image to owned server
 route.post(
   "/uploadFile",
   uploader.array("files"),

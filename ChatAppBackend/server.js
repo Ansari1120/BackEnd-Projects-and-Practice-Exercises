@@ -6,6 +6,7 @@ const app = express();
 const userRoutes = require("./routes/userRoutes");
 const chatRoute = require("./routes/chatRoute");
 const messageRoute = require("./routes/messageRoute");
+const assetRoute = require("./routes/assetRoute");
 const notFound = require("./middleware/errMiddleware");
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use(cors());
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoute);
 app.use("/api/message", messageRoute);
+app.use("/api/asset", assetRoute);
 app.use(notFound);
 app.get("/", (req, res) => {
   res.send("Server Started...");
