@@ -17,10 +17,10 @@ app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoute);
 app.use("/api/message", messageRoute);
 app.use("/api/asset", assetRoute);
-app.use(notFound);
 app.get("/", (req, res) => {
   res.send("Server Started...");
 });
+app.use(notFound);
 
 connectDB()
   .then(() => {
