@@ -46,7 +46,8 @@ connectDB()
     const io = require("socket.io")(server, {
       pingTimeout: 60000, //60 thausand mili-second  = 1 minute after it went off to save bandwidth
       cors: {
-        origin: process.env.CLIENT_BASE_URL,
+        origin:
+          "https://front-end-projects-and-practice-exercises-react.vercel.app",
       },
     });
     io.on("connection", (socket) => {
