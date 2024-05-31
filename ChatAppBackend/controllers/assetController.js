@@ -46,7 +46,10 @@ const uploadAsset = async (req, res) => {
 
     // Return the Cloudinary URL as a response
     // return result.secure_url;
-
+    // const signedUrl = cloudinary.url(result.url, {
+    //   sign_url: true,
+    //   secure: true,
+    // });
     return res.status(200).json({
       status: 200,
       message: "Your Asset uploaded to the Cloud Successfully.",

@@ -40,11 +40,6 @@ connectDB()
       socket.on("setup", (userData) => {
         socket.join(userData._id);
         console.log("user of id joins application :", userData._id);
-        // onlineUsers[userData._id] = {
-        //   socketId: socket.id,
-        //   lastActivity: Date.now(),
-        // };
-        // socket.emit("userStatus", { userId: userData._id, status: "online" }); // Notify all users about online status
         socket.emit("connected");
       });
 
@@ -71,9 +66,6 @@ connectDB()
         });
       });
 
-      const userIds = new Set();
-
-      // Listen for status updates from clients
       // Listen for status updates from clients
       socket.on("status", (userData) => {
         console.log("User status:", userData._id);
@@ -115,42 +107,10 @@ connectDB()
           users[existingUserIndex].status = "offline";
           users[existingUserIndex].lastSeen = Date.now();
         }
-        // users.push({
-        //   status: "offline",
-        //   lastSeen: Date.now(),
-        //   userID: userData._id,
-        // });
+
+        console.log("Users status:", users);
         io.emit("users", users);
       });
-      //careate socket.on (online)
-      //recieve user id and store it in the array of online
-      //emit an event of array containing online.
-      //implement an activtiy indicator to auto offline user and remove it from online array
-
-      // socket.on("disconnect", () => {
-      //   for (const userId in onlineUsers) {
-      //     if (onlineUsers[userId].socketId === socket.id) {
-      //       const user = onlineUsers[userId];
-      //       delete onlineUsers[userId];
-      //       io.emit("userStatus", {
-      //         userId,
-      //         status: "offline",
-      //         lastActivity: user.lastActivity,
-      //       });
-      //       break;
-      //     }
-      //   }
-      //   console.log("User disconnected");
-      // });
-
-      // socket.on("heartbeat", () => {
-      //   for (const userId in onlineUsers) {
-      //     if (onlineUsers[userId].socketId === socket.id) {
-      //       onlineUsers[userId].lastActivity = Date.now();
-      //       break;
-      //     }
-      //   }
-      // });
 
       socket.off("setup-off", (userData) => {
         console.log("user disconnected");
