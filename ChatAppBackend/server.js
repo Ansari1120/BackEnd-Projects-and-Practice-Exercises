@@ -10,9 +10,24 @@ const assetRoute = require("./routes/assetRoute");
 const notFound = require("./middleware/errMiddleware");
 dotenv.config();
 
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://front-end-projects-and-practice-exercises-react.vercel.app",
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+};
+
 app.use(express.json());
 // Allow requests from all origins
-app.use(cors());
+app.use(cors(corsOptions));
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoute);
 app.use("/api/message", messageRoute);
