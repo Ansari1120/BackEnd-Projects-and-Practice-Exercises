@@ -9,7 +9,8 @@
 /coverage
 
 # env
-.env
+./ChatAppBackend/.env
+./completeBackendwithAuthenticationWith4Routes/.env
 
 # production
 /build
