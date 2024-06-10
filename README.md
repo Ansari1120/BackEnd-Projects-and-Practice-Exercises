@@ -17,7 +17,7 @@ It Includes Server Side Scripting Technologies includes :
 BASE_URL) https://backendtestapione.netlify.app/.netlify/functions/api/student
 <p>EndPoints available : user, teacher, student,institute , course (apply get post put delete on it) /p>
   
-<h2>Deployed over Cyclic with its configurations:</h2>
+<h2>Deployed over Render with its configurations:</h2>
 BASE_URL) https://taskcy-mobile-app-backend-by-ahmed.onrender.com/
 
 <p>EndPoints available : api/user , api/course , api/projects , api/tasks , api/teams (apply get post put delete on it) </p>
@@ -53,11 +53,6 @@ BASE_URL) https://full-stack-blog-app-nextjs-1dqo.vercel.app/api
     "blogID": "64cadf78c1f52170d7b28270",
     "commenterName": "Micheal Morris"
 } </p>
-
-<h2>Deployed over Render a postbuild backend template (ready to use with realworld app's backend):</h2>
-BASE_URL) https://render-deploy-23ts.onrender.com/
-
-<p>EndPoints available : api/user , api/course , api/projects , api/tasks , api/teams (apply get post put delete on it) </p>
 
 ### <em>(NOTE:BELOW APIS ARE RESTRICTED ,  PROTECTED THROUGH MIDDLEWARE and SECRET KEY/TOKEN)</em>
 
