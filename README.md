@@ -18,7 +18,7 @@ BASE_URL) https://backendtestapione.netlify.app/.netlify/functions/api/student
 <p>EndPoints available : user, teacher, student,institute , course (apply get post put delete on it) /p>
   
 <h2>Deployed over Cyclic with its configurations:</h2>
-BASE_URL) https://mushy-wasp-raincoat.cyclic.cloud/
+BASE_URL) https://taskcy-mobile-app-backend-by-ahmed.onrender.com/
 
 <p>EndPoints available : api/user , api/course , api/projects , api/tasks , api/teams (apply get post put delete on it) </p>
 
