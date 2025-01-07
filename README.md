@@ -6,6 +6,7 @@ It Includes Server Side Scripting Technologies includes :
 - Node js
 - Mongo Db
 - postgresql and Mysql Database
+- GraphQL
 - Prisma Orm
 - Drizzle Orm
 - brcyptjs for password hashing
